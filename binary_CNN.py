@@ -11,7 +11,7 @@ from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.layers import Flatten
 from keras.layers import Dense
-from keras.layers import Dropout
+
 
 #paths to find train and test data
 train_Big_Finger_dir = '/home/dmitriy/Documents/Dataset-1/'
@@ -39,7 +39,7 @@ print("Train Set samples- Big Finger-"+str(train_Big_Finger_sample)+" Goat-"+str
 
 #print("Test Set samples- HAND-"+str(test_hand_sample)+" NON_HAND-"+str(test_non_hand_sample))
 
-train_x_data_set=np.zeros([train_Big_Finger_sample+train_Goat_sample+train_Victory_sample+train_No_Sign_sample,100,100,3])
+train_x_data_set=np.zeros([train_Big_Finger_sample+train_Goat_sample+train_Victory_sample+train_No_Sign_sample,100,100,1])
 print("shape of training data set: "+ str(train_x_data_set.shape))
 
 train_y_data_set=np.array([])
@@ -71,7 +71,7 @@ for index,filename in enumerate(os.listdir(train_No_Sign_dir)):
     img = Image.open(train_No_Sign_dir+filename)
     img = img.resize((100,100),Image.ANTIALIAS)
     im = np.array(img)
-    train_x_data_set[index, :, :, :] = im
+    train_x_data_set[index, :, :] = im
     train_y_data_set = np.append(train_y_data_set, 3)
 
 
@@ -91,22 +91,21 @@ print(train_y_data_set)
 
 
 model = Sequential()
-model.add(Conv2D(8,(3,3),input_shape=(100,100,3),activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(Conv2D(8,(3,3),input_shape=(100,100,2),activation='relu'))
+model.add(MaxPooling2D(pool_size=(2,2),strides=2))
 model.add(Conv2D(12,(3,3),activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
+model.add(MaxPooling2D(pool_size=(2,2),strides=2))
 model.add(Conv2D(16,(3,3),activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Dropout(0.5))
 model.add(Flatten())
 model.add(Dense(units=128,activation='relu'))
-model.add(Dense(units=4,activation='softmax'))
-model.summary()
+model.add(Dense(units=4,activation='sigmoid'))
+
 
 model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['accuracy'])
 
-model.fit(train_x_data_set,train_y_data_set,epochs=10)
-
+model.fit(train_x_data_set,train_y_data_set,epochs=5)
+#model.summary()
 
 #test_x_data_set=np.zeros([test_hand_sample+test_non_hand_sample,100,100,3])
 test_file_list = []

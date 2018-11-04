@@ -15,7 +15,7 @@ gray_high = np.array((250), np.uint8)
 
 cap = cv2.VideoCapture(0)
 i = 0
-for i in range(0,400):
+for i in range (0, 400):
     ret, img = cap.read()
     img = cv2.GaussianBlur(img, (7,7), 0)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -31,33 +31,16 @@ for i in range(0,400):
         if area > 4000:
             cv2.drawContours(im2, contour, -1, (0, 255, 0), 2)
     #cv2.drawContours(img, contours, -1, (0, 255, 0), 3)
-    cv2.imshow('output2', thresh_im2)
     #cv2.imshow('output', img)
-    cv2.imshow('output3', thresh)
-
+    cv2.imshow('output3', thresh_im2)
+    cv2.imshow('output4', thresh)
+    im3 = cv2.cvtColor(thresh_im2, cv2.COLOR_GRAY2BGR)
+    im4 = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
     path = "%.4d.jpg" % i
-    cv2.imwrite("image" + str(i)+ ".jpg", thresh)
+    cv2.imwrite("image" + str(i)+ ".jpg", im4)
     i += 1
     key = cv2.waitKey(10)
+    #print(cv2.countNonZero(thresh))
 
+    
 
-
-
-'''
-
-b = []
-
-for k in range(0,200):
-    if k < 5:
-        j = k
-    else:
-        j = k - 4
-    a = open("{id:04d}.jpg".format(id=k), "r")
-    #c = os.path.splitext(a.name)[0]
-    #c = int(c)
-    #print(a.name)
-    b.append(a.name)
-    if len(b) > 5:
-        #print(b[k])
-        os.remove("{id:04d}.jpg".format(id=j))
-'''

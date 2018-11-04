@@ -14,6 +14,11 @@ from keras.layers import Flatten
 from keras.layers import Dense
 from keras.models import model_from_json
 import cv2
+
+h_min = np.array((41, 24, 0), np.uint8)
+h_max = np.array((240, 164, 252), np.uint8)
+gray_low = np.array((220), np.uint8)
+gray_high = np.array((250), np.uint8)
 #Загрузка нейронной сети(весов и т.д.)
 # load json and create model
 json_file = open('model.json', 'r')
@@ -52,43 +57,32 @@ def Images_Capture():
 
     while cap.isOpened():
         ret, img = cap.read()
-        img = cv2.resize(img, (100, 100))
+
+        img = cv2.GaussianBlur(img, (7, 7), 0)
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+        im = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        im2 = cv2.equalizeHist(im)
+        thresh_im2 = cv2.inRange(im2, gray_low, gray_high)
+        thresh = cv2.inRange(hsv, h_min, h_max)
+        im3 = cv2.cvtColor(thresh_im2, cv2.COLOR_GRAY2BGR)
+        im4 = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+        img = cv2.resize(im4, (100, 100))
 
         test_x_data_set = np.zeros([1, 100, 100, 3])
         for index in range(1):
             test_x_data_set[index, :, :, :] = img
-        print(img.shape)
+        #print(img.shape)
         cv2.imshow('output', img)
         key = cv2.waitKey(10)
-        #Сохранение изображений
-        #path = "%.4d.jpg" % i
-        #cv.SaveImage(path, frame)
-        time.sleep(1)
-        #Удаление старых изображений
+        Y_pred = model.predict(test_x_data_set)
+        print(Y_pred)
+        y_pred = np.argmax(Y_pred, axis=1)
+        print(y_pred)
+        #d = model.predict_classes(test_x_data_set)
+        #print(d)
 
-        d = model.predict(test_x_data_set)
-        print (d)
-#Функция классификации изображений
-def Sign_Detection():
 
-    test_hand_sample = len(os.listdir(test_hand_dir))
-    print("Test Set samples- "+str(test_hand_sample))
-
-    test_x_data_set = np.zeros([test_hand_sample, 100, 100, 3])
-    test_file_list = []
-
-    for index, filename in enumerate(os.listdir(test_hand_dir)):
-        img = Image.open(test_hand_dir+filename)
-        test_file_list.append(filename)
-        img = img.resize((100, 100), Image.ANTIALIAS)
-        im = np.array(img)
-        test_x_data_set[index, :, :, :] = im
-
-    test_x_data_set = test_x_data_set/255
-
-    c = model.predict(test_x_data_set)
-    return(c)
-    #print(time_predictions)
 
 Images_Capture()
 #s = Sign_Detection()
