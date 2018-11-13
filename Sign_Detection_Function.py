@@ -19,38 +19,7 @@ h_min = np.array((41, 24, 0), np.uint8)
 h_max = np.array((240, 164, 252), np.uint8)
 gray_low = np.array((220), np.uint8)
 gray_high = np.array((250), np.uint8)
-#Загрузка нейронной сети(весов и т.д.)
-# load json and create model
-json_file = open('model.json', 'r')
-loaded_model_json = json_file.read()
-json_file.close()
-loaded_model = model_from_json(loaded_model_json)
-# load weights into new model
-loaded_model.load_weights("model.h5")
-print("Loaded model from disk")
 
-model = Sequential()
-model.add(Conv2D(8,(3,3),input_shape=(100,100,3),activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2),strides=2))
-model.add(Conv2D(12,(3,3),activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2),strides=2))
-model.add(Conv2D(16,(3,3),activation='relu'))
-model.add(MaxPooling2D(pool_size=(2,2)))
-model.add(Flatten())
-model.add(Dense(units=128,activation='relu'))
-model.add(Dense(units=1,activation='sigmoid'))
-
-model.compile(optimizer='adam',loss='binary_crossentropy',metrics=['accuracy'])
-
-test_hand_dir = '/home/dmitriy/Documents/Dataset-3/'
-
-
-
-
-#Список изображений, полученных с камеры
-b = []
-c = []
-#Функция получения изображений
 def Images_Capture():
 
     cap = cv2.VideoCapture(0)
@@ -75,15 +44,20 @@ def Images_Capture():
         #print(img.shape)
         cv2.imshow('output', img)
         key = cv2.waitKey(10)
-        Y_pred = model.predict(test_x_data_set)
-        print(Y_pred)
-        y_pred = np.argmax(Y_pred, axis=1)
-        print(y_pred)
-        #d = model.predict_classes(test_x_data_set)
-        #print(d)
+        d = loaded_model.predict_classes(test_x_data_set)
+        print(d)
+
+#Загрузка нейронной сети(весов и т.д.)
+# load json and create model
+json_file = open('model.json', 'r')
+loaded_model_json = json_file.read()
+json_file.close()
+loaded_model = model_from_json(loaded_model_json)
+# load weights into new model
+loaded_model.load_weights("model.h5")
+print("Loaded model from disk")
 
 
+test_hand_dir = '/home/dmitriy/Documents/Dataset-3/'
 
 Images_Capture()
-#s = Sign_Detection()
-#print(s)

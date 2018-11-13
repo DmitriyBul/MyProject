@@ -14,17 +14,17 @@ from keras.layers import Dense
 from keras.layers import Dropout
 
 #paths to find train and test data
-train_Big_Finger_dir = '/home/dmitriy/Documents/Dataset-1/'
-train_Goat_dir = '/home/dmitriy/Documents/Dataset-2/'
-train_Victory_dir = '/home/dmitriy/Documents/Dataset-3/'
+train_Hand_dir = '/home/dmitriy/Documents/Dataset-1/'
+train_Three_dir = '/home/dmitriy/Documents/Dataset-2/'
+train_Ok_dir = '/home/dmitriy/Documents/Dataset-3/'
 train_No_Sign_dir = '/home/dmitriy/Documents/Dataset-4/'
 test_hand_dir = '/home/dmitriy/Documents/Dataset_6/'
 test_non_hand_dir = '/home/dmitriy/Documents/Dataset_5/'
 
 #get data set count
-train_Big_Finger_sample = len(os.listdir(train_Big_Finger_dir))
-train_Goat_sample = len(os.listdir(train_Goat_dir))
-train_Victory_sample = len(os.listdir(train_Victory_dir))
+train_Hand_sample = len(os.listdir(train_Hand_dir))
+train_Three_sample = len(os.listdir(train_Three_dir))
+train_Ok_sample = len(os.listdir(train_Ok_dir))
 train_No_Sign_sample = len(os.listdir(train_No_Sign_dir))
 
 
@@ -33,34 +33,34 @@ test_non_hand_sample = len(os.listdir(test_non_hand_dir))
 
 
 
-print("Train Set samples- Big Finger-"+str(train_Big_Finger_sample)+" Goat-"+str(train_Goat_sample)+" Victory-"+str(train_Victory_sample)+" No Sign-"+str(train_No_Sign_sample))
+print("Train Set samples- Hand-"+str(train_Hand_sample)+" Three-"+str(train_Three_sample)+" Ok-"+str(train_Ok_sample)+" No Sign-"+str(train_No_Sign_sample))
 
 
 
 #print("Test Set samples- HAND-"+str(test_hand_sample)+" NON_HAND-"+str(test_non_hand_sample))
 
-train_x_data_set=np.zeros([train_Big_Finger_sample+train_Goat_sample+train_Victory_sample+train_No_Sign_sample,100,100,3])
+train_x_data_set=np.zeros([train_Hand_sample+train_Three_sample+train_Ok_sample+train_No_Sign_sample,100,100,3])
 print("shape of training data set: "+ str(train_x_data_set.shape))
 
 train_y_data_set=np.array([])
 
 #load images containing hand in train_x_data_set matrix
-for index,filename in enumerate(os.listdir(train_Big_Finger_dir)):
-    img = Image.open(train_Big_Finger_dir+filename)
+for index,filename in enumerate(os.listdir(train_Hand_dir)):
+    img = Image.open(train_Hand_dir+filename)
     img = img.resize((100,100),Image.ANTIALIAS)
     im = np.array(img)
     train_x_data_set[index, :, :, :] = im
     train_y_data_set = np.append(train_y_data_set, 0)
 
-for index,filename in enumerate(os.listdir(train_Goat_dir)):
-    img = Image.open(train_Goat_dir+filename)
+for index,filename in enumerate(os.listdir(train_Three_dir)):
+    img = Image.open(train_Three_dir+filename)
     img = img.resize((100,100),Image.ANTIALIAS)
     im = np.array(img)
     train_x_data_set[index, :, :, :] = im
     train_y_data_set = np.append(train_y_data_set, 1)
 
-for index,filename in enumerate(os.listdir(train_Victory_dir)):
-    img = Image.open(train_Victory_dir+filename)
+for index,filename in enumerate(os.listdir(train_Ok_dir)):
+    img = Image.open(train_Ok_dir+filename)
     img = img.resize((100,100),Image.ANTIALIAS)
     im = np.array(img)
     train_x_data_set[index, :, :, :] = im
@@ -83,7 +83,6 @@ print(train_x_data_set)
 #train_y_data_set=np.array([])
 
 
-#train_y_data_set=np.append(np.append(np.append(np.append(train_y_data_set,[1]*train_Big_Finger_sample),[0.66]*train_Goat_sample),[0.33]*train_Victory_sample),[0]*train_No_Sign_sample)
 train_y_data_set = keras.utils.to_categorical(train_y_data_set, num_classes = 4)
 #print(train_y_data_set.shape)
 #print("shape of train label:"+str(train_y_data_set.shape))
@@ -105,9 +104,9 @@ model.summary()
 
 model.compile(optimizer='adam',loss='categorical_crossentropy',metrics=['accuracy'])
 
-model.fit(train_x_data_set,train_y_data_set,epochs=10)
+model.fit(train_x_data_set,train_y_data_set,epochs=50)
 
-
+'''
 #test_x_data_set=np.zeros([test_hand_sample+test_non_hand_sample,100,100,3])
 test_file_list = []
 
@@ -120,16 +119,17 @@ for index,filename in enumerate(os.listdir(test_hand_dir)):
     test_x_data_set[index,:,:,:]=im
 
 #test_x_data_set = test_x_data_set/255
-
+'''
 model_json = model.to_json()
 with open("model.json", "w") as json_file:
     json_file.write(model_json)
 
 model.save_weights("model.h5")
 print("Saved model to disk")
-
+'''
 test_x_data_set = np.zeros([1, 100, 100, 3])
 for index in range(1):
     test_x_data_set[index, :, :, :] = img
 d = model.predict(test_x_data_set)
 print (d)
+'''
