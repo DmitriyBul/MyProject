@@ -7,16 +7,11 @@ import numpy as np
 from PIL import Image
 import matplotlib as plt
 import timeit
-from keras.models import Sequential
-from keras.layers import Conv2D
-from keras.layers import MaxPooling2D
-from keras.layers import Flatten
-from keras.layers import Dense
 from keras.models import model_from_json
 import cv2
 
-h_min = np.array((41, 24, 0), np.uint8)
-h_max = np.array((240, 164, 252), np.uint8)
+h_min = np.array((155, 0, 138), np.uint8)
+h_max = np.array((176, 84, 255), np.uint8)
 gray_low = np.array((220), np.uint8)
 gray_high = np.array((250), np.uint8)
 
