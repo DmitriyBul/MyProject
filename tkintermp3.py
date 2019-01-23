@@ -11,6 +11,12 @@ from tkFileDialog import askdirectory
 import pygame
 from mutagen.id3 import ID3
 import tkMessageBox
+import arrow
+import calendar
+import requests, bs4
+import Sign_Detection_Function
+from Sign_Detection_Function import Images_Capture
+
 
 
 class Question():
@@ -21,18 +27,18 @@ class Question():
         self.Sign_Detection = Button(main, text="Режим распознавания жестов", width=30, height=15)
         self.Music_Run = Button(main, text="Режим воспроизведения музыки", width=30, height=15)
         self.Weather_Forecast = Button(main, text="Режим прогноза погоды", width=30, height=15)
-        self.Motor_Control = Button(main, text="Режим управления двигателем", width=30, height=15)
+        self.Calendar = Button(main, text="Календарь", width=30, height=15)
 
         self.label1.grid(row=0, column=1)
         self.Sign_Detection.grid(row=1, column=1)
         self.Music_Run.grid(row=1, column=2)
         self.Weather_Forecast.grid(row=2, column=1)
-        self.Motor_Control.grid(row=2, column=2)
+        self.Calendar.grid(row=2, column=2)
 
         self.Sign_Detection.bind("<Button-1>", self.answer_sign)
         self.Music_Run.bind("<Button-1>", self.answer_music)
         self.Weather_Forecast.bind("<Button-1>", self.answer_weather)
-        self.Motor_Control.bind("<Button-1>", self.answer_motor)
+        self.Calendar.bind("<Button-1>", self.answer_calendar)
 
 
     def answer_sign(self, event):
@@ -40,15 +46,12 @@ class Question():
         root.withdraw()
         root1.deiconify()
         Child_Sign(root1)
-
+        Images_Capture()
 
     def answer_music(self, event):
         print("Music")
         root.withdraw()
         root5.deiconify()
-
-        #Child_Music(root2)
-
 
 
     def answer_weather(self, event):
@@ -57,20 +60,16 @@ class Question():
         root3.deiconify()
         Child_Weather(root3)
 
-
-
-
-
-    def answer_motor(self, event):
-        print("Motor")
+    def answer_calendar(self, event):
+        print("Calendar")
         root.withdraw()
         root4.deiconify()
-        Child_Motor(root4)
+        Child_Calendar(root4)
+
 
 class Child_Sign():
 
     def __init__(self, main2):
-
         self.label_Sign = Label(main2, width=25, font=3, text="Режим распознавания жестов")
         self.label_Sign.grid(row=0, column=2)
         self.Btn_Sign = Button(main2, text="Назад в меню", width=45, height=15)
@@ -104,7 +103,12 @@ class Child_Weather():
     def __init__(self, main4):
         self.label_Weather = Label(main4, width=25, font=3, text="Режим прогноза погоды")
         self.label_Weather.grid(row=0, column=2)
-        self.Btn_Weather = Button(main4, text="Назад в меню", width=45, height=15)
+        self.weather_text = Text(main4, height=8, width=60)
+        self.weather_text.grid(row=3, column=2)
+        self.weather_text.insert(END, "Morning " + pogoda1 + " " + pogoda2 + "\n")
+        self.weather_text.insert(END, "Day " + pogoda3 + " " + pogoda4 + "\n")
+        self.weather_text.insert(END, pogoda.strip())
+        self.Btn_Weather = Button(main4, text="Назад в меню", width=25, height=1)
         self.Btn_Weather.grid(row=1, column=2)
         self.Btn_Weather.bind("<Button-1>", self.back_from_weather)
 
@@ -114,20 +118,42 @@ class Child_Weather():
         root3.withdraw()
         root.deiconify()
 
-class Child_Motor():
+class Child_Calendar():
 
     def __init__(self, main5):
-        self.label_Motor = Label(main5, width=25, font=3, text="Режим управления приводами")
-        self.label_Motor.grid(row=0, column=2)
-        self.Btn_Motor = Button(main5, text="Назад в меню", width=45, height=15)
-        self.Btn_Motor.grid(row=1, column=2)
-        self.Btn_Motor.bind("<Button-1>", self.back_from_motor)
+        self.label_Calendar = Label(main5, width=25, font=3, text="Календарь")
+        self.label_Calendar.grid(row=0, column=2)
+        self.date_text = Text(main5, height=8,width=21)
+        self.date_text.grid(row=3, column=2)
+        self.date_text.insert(END, calendar.month(year, month))
+        self.Btn_Calendar = Button(main5, text="Назад в меню", width=25, height=1)
+        self.Btn_Calendar.grid(row=4, column=2)
+        self.Btn_Calendar.bind("<Button-1>", self.back_from_calendar)
 
-    def back_from_motor(self, event):
+    def back_from_calendar(self, event):
 
         Question(root)
         root4.withdraw()
         root.deiconify()
+
+year_and_month = arrow.now().format('YYYY-MM')
+year = int(year_and_month[:4])
+month = int(year_and_month[5:])
+full_date = calendar.month(year, month)
+s=requests.get('https://sinoptik.com.ru/погода-томск')
+b=bs4.BeautifulSoup(s.text, "html.parser")
+p3=b.select('.temperature .p3')
+pogoda1=p3[0].getText()
+p4=b.select('.temperature .p4')
+pogoda2=p4[0].getText()
+p5=b.select('.temperature .p5')
+pogoda3=p5[0].getText()
+p6=b.select('.temperature .p6')
+pogoda4=p6[0].getText()
+p=b.select('.rSide .description')
+pogoda=p[0].getText()
+
+
 
 
 root = Tk()
